@@ -80,39 +80,46 @@ if st.button('חשב'):
     total_service_fees = round_down(total_service_fees)
     
     # Add the summary rows
-    results.append({
-        'שם': '',
-        'שעות עבודה': '',
-        'סכום כולל': '',
-        'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
-        'נטו': ''
-    })
-
-    results.append({
-        'שם': '',
-        'שעות עבודה': '',
-        'סכום כולל': '',
-        'דמי שירות': f'הפרשה לבר: {bar_deduction}',
-        'נטו': ''
-    })
-
-    results.append({
-        'שם': '',
-        'שעות עבודה': '',
-        'סכום כולל': '',
-        'דמי שירות': f'סך הכול שעות: {total_hours}',
-        'נטו': ''
-    })
-
     current_date = datetime.now().strftime("%Y-%m-%d")
-    results.append({
-        'שם': '',
-        'שעות עבודה': '',
-        'סכום כולל': '',
-        'דמי שירות': f'תאריך: {current_date}',
-        'נטו': ''
-    })
+    summary_rows = [
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'הפרשה לבר: {bar_deduction}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול שעות: {total_hours}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול טיפים: {round_down(total_tips)}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'תאריך: {current_date}',
+            'נטו': ''
+        }
+    ]
 
+    results.extend(summary_rows)
     results_df = pd.DataFrame(results)
 
     # Display results
@@ -120,6 +127,7 @@ if st.button('חשב'):
     st.success(f'הפרשה לבר: {bar_deduction} ש"ח')
     st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
     st.success(f'סה"כ שעות עבודה: {total_hours} שעות')
+    st.success(f'סה"כ טיפים: {round_down(total_tips)} ש"ח')
 
     # Save the results to a CSV file with the current date in the filename
     csv_filename = f'משמרת_{current_date}.csv'
