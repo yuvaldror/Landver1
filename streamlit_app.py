@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 from datetime import datetime, timedelta
+import pytz
 import os
 
 # Set the page configuration
@@ -26,9 +27,10 @@ st.markdown(
 def round_down(value):
     return math.floor(value)
 
-# Function to determine the correct date and shift type based on the current date and time
+# Function to determine the correct date and shift type based on the current date and time in Israel timezone
 def get_shift_date_and_type():
-    now = datetime.now()
+    israel_tz = pytz.timezone('Asia/Jerusalem')
+    now = datetime.now(israel_tz)
     day_of_week = now.weekday()
     hour = now.hour
 
@@ -68,10 +70,10 @@ def get_shift_date_and_type():
     return shift_date_str
 
 # Set the title of the app
-st.title(' לכל מי שמב"ר ')
+st.title('לנדוור חישוב טיפים')
 
 # Input for the number of waitresses
-num_waitresses = st.number_input('כמה מלצרים עבדו', min_value=1, step=1)
+num_waitresses = st.number_input('הכנס את מספר המלצריות במשמרת', min_value=1, step=1)
 
 # Create a list to store the details of each waitress
 waitresses = []
