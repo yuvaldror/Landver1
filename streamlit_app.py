@@ -10,10 +10,9 @@ st.set_page_config(
     page_icon=':coffee:'
 )
 
-# Function to round down values
-def round_down(value, decimals=0):
-    factor = 10 ** decimals
-    return math.floor(value * factor) / factor
+# Function to round down values without decimal places
+def round_down(value):
+    return math.floor(value)
 
 # Set the title of the app
 st.title('אפליקציית ניהול טיפים למלצריות')
@@ -39,32 +38,40 @@ if st.button('חשב'):
 
     # Calculate money made per hour
     money_per_hour = (total_tips * 0.97) / total_hours if total_hours > 0 else 0
-    money_per_hour = round_down(money_per_hour, 2)
+    money_per_hour = round_down(money_per_hour)
 
     # Calculate הפרשה לבר
     bar_deduction = total_tips * 0.03
-    bar_deduction = round_down(bar_deduction, 2)
+    bar_deduction = round_down(bar_deduction)
+
+    # Create a dataframe to store the results
+    results = []
+    total_service_fees = 0
+
+    for waitress in waitresses:
+        total_made = waitress['שעות עבודה'] * money_per_hour
+        total_made = round_down(total_made)
+        service_fee = total_made * 0.2
+        service_fee = round_down(service_fee)
+        net_income = total_made * 0.8
+        net_income = round_down(net_income)
+        total_service_fees += service_fee
+
+        results.append({
+            'שם': waitress['שם'],
+            'שעות עבודה': round_down(waitress['שעות עבודה']),
+            'סכום כולל': total_made,
+            'דמי שירות': service_fee,
+            'נטו': net_income
+        })
+
+    total_service_fees = round_down(total_service_fees)
+    results_df = pd.DataFrame(results)
 
     # Display results
     st.success(f'סכום כסף לשעה: {money_per_hour} ש"ח')
     st.success(f'הפרשה לבר: {bar_deduction} ש"ח')
-
-    # Create a dataframe to store the results
-    results = []
-    for waitress in waitresses:
-        total_made = waitress['שעות עבודה'] * money_per_hour
-        service_fee = total_made * 0.2
-        net_income = total_made * 0.8
-
-        results.append({
-            'שם': waitress['שם'],
-            'שעות עבודה': waitress['שעות עבודה'],
-            'סכום כולל': round_down(total_made, 2),
-            'דמי שירות': round_down(service_fee, 2),
-            'נטו': round_down(net_income, 2)
-        })
-
-    results_df = pd.DataFrame(results)
+    st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
 
     # Save the results to TipsSaver.csv with utf-8 encoding
     file_path = 'TipsSaver.csv'
@@ -97,4 +104,4 @@ if st.button('חשב'):
         mime='text/csv'
     )
 
-    # Display the collected data
+
