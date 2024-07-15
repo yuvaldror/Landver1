@@ -66,11 +66,11 @@ if st.button('חשב'):
 
     results_df = pd.DataFrame(results)
 
-    # Save the results to TipsSaver.csv with windows-1255 encoding
+    # Save the results to TipsSaver.csv with utf-8 encoding
     file_path = 'TipsSaver.csv'
     if os.path.exists(file_path):
         try:
-            existing_data = pd.read_csv(file_path, encoding='windows-1255')
+            existing_data = pd.read_csv(file_path, encoding='utf-8')
             if set(existing_data.columns) != set(results_df.columns):
                 st.error("העמודות בקובץ הקיים לא תואמות לעמודות החדשות.")
             else:
@@ -83,17 +83,18 @@ if st.button('חשב'):
     else:
         updated_data = results_df
 
-    updated_data.to_csv(file_path, index=False, encoding='windows-1255')
+    updated_data.to_csv(file_path, index=False, encoding='utf-8')
+
+    # Convert the DataFrame to windows-1255 for download
+    results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
 
     # Provide the new record for download
     st.subheader('הורד את רשומת הטיפים החדשה')
     st.download_button(
         label='הורד CSV',
-        data=results_df.to_csv(index=False, encoding='windows-1255').encode('windows-1255'),
+        data=results_df_encoded.to_csv(index=False, encoding='windows-1255').encode('windows-1255'),
         file_name='NewTipRecord.csv',
         mime='text/csv'
     )
 
     # Display the collected data
-    st.subheader('נתוני טיפים שנאספו')
-    st.write(updated_data)
