@@ -85,9 +85,10 @@ if st.button('חשב'):
     st.success(f'הפרשה לבר: {bar_deduction} ש"ח')
     st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
 
-    # Save the results to TipsSaver.csv with utf-8 encoding
-    file_path = 'TipsSaver.csv'
-    results_df.to_csv(file_path, index=False, encoding='utf-8')
+    # Save the results to a CSV file with the current date in the filename
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    csv_filename = f'משמרת_{current_date}.csv'
+    results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
@@ -97,7 +98,7 @@ if st.button('חשב'):
     st.download_button(
         label='הורד CSV',
         data=results_df_encoded.to_csv(index=False, encoding='windows-1255').encode('windows-1255'),
-        file_name='NewTipRecord.csv',
+        file_name=csv_filename,
         mime='text/csv'
     )
 
