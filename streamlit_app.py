@@ -68,10 +68,10 @@ def get_shift_date_and_type():
     return shift_date_str
 
 # Set the title of the app
-st.title('אפליקציית ניהול טיפים למלצריות')
+st.title(' לכל מי שמב"ר ')
 
 # Input for the number of waitresses
-num_waitresses = st.number_input('הכנס את מספר המלצריות במשמרת', min_value=1, step=1)
+num_waitresses = st.number_input('כמה מלצרים עבדו', min_value=1, step=1)
 
 # Create a list to store the details of each waitress
 waitresses = []
@@ -79,11 +79,11 @@ waitresses = []
 for i in range(num_waitresses):
     with st.expander(f'מלצרית {i+1}'):
         name = st.text_input(f'הכנס את שם המלצרית {i+1}', key=f'name_{i}')
-        hours_worked = st.number_input(f'הכנס את מספר השעות שהמלצרית {i+1} עבדה', min_value=0.0, step=0.1, key=f'hours_{i}')
+        hours_worked = st.number_input(f'כמה שעות המלצר {i+1} עבד', min_value=0.0, step=0.1, key=f'hours_{i}')
         waitresses.append({'שם': name, 'שעות עבודה': hours_worked})
 
 # Input for the total tips collected
-total_tips = st.number_input('הכנס את סכום הטיפים הכולל שנאסף במשמרת', min_value=0.0, step=0.01)
+total_tips = st.number_input('כמה כסף יש בטיפים', min_value=0.0, step=0.01)
 
 if st.button('חשב'):
     # Calculate total hours worked
@@ -208,5 +208,5 @@ if st.button('חשב'):
     )
 
     # Display the current session's data
-    st.subheader('נתוני טיפים שנאספו')
+    st.subheader('סוף משמרת')
     st.write(results_df)
