@@ -96,15 +96,32 @@ if st.button('חשב'):
         'נטו': ''
     })
 
+    results.append({
+        'שם': '',
+        'שעות עבודה': '',
+        'סכום כולל': '',
+        'דמי שירות': f'סך הכול שעות: {total_hours}',
+        'נטו': ''
+    })
+
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    results.append({
+        'שם': '',
+        'שעות עבודה': '',
+        'סכום כולל': '',
+        'דמי שירות': f'תאריך: {current_date}',
+        'נטו': ''
+    })
+
     results_df = pd.DataFrame(results)
 
     # Display results
     st.success(f'סכום כסף לשעה: {money_per_hour} ש"ח')
     st.success(f'הפרשה לבר: {bar_deduction} ש"ח')
     st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
+    st.success(f'סה"כ שעות עבודה: {total_hours} שעות')
 
     # Save the results to a CSV file with the current date in the filename
-    current_date = datetime.now().strftime("%Y-%m-%d")
     csv_filename = f'משמרת_{current_date}.csv'
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
