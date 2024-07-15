@@ -31,7 +31,7 @@ if submit_button:
     file_path = 'TipsSaver.csv'
     if os.path.exists(file_path):
         try:
-            existing_data = pd.read_csv(file_path, encoding='utf-8-sig')
+            existing_data = pd.read_csv(file_path, encoding='utf-8')
             if set(existing_data.columns) != set(new_record.columns):
                 st.error("העמודות בקובץ הקיים לא תואמות לעמודות החדשות.")
             else:
@@ -44,13 +44,13 @@ if submit_button:
     else:
         updated_data = new_record
 
-    updated_data.to_csv(file_path, index=False, encoding='utf-8-sig')
+    updated_data.to_csv(file_path, index=False, encoding='utf-8')
 
     # Provide the new record for download
     st.subheader('הורד את רשומת הטיפים החדשה')
     st.download_button(
         label='הורד CSV',
-        data=new_record.to_csv(index=False, encoding='utf-8-sig').encode('utf-8-sig'),
+        data=new_record.to_csv(index=False, encoding='utf-8').encode('utf-8'),
         file_name='NewTipRecord.csv',
         mime='text/csv'
     )
