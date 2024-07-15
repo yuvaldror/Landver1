@@ -29,18 +29,18 @@ if submit_button:
     # Save the new record to TipsSaver.csv
     file_path = 'TipsSaver.csv'
     if os.path.exists(file_path):
-        existing_data = pd.read_csv(file_path)
+        existing_data = pd.read_csv(file_path, encoding='utf-8')
         updated_data = pd.concat([existing_data, new_record], ignore_index=True)
     else:
         updated_data = new_record
 
-    updated_data.to_csv(file_path, index=False)
+    updated_data.to_csv(file_path, index=False, encoding='utf-8')
 
     # Provide the new record for download
     st.subheader('הורד את רשומת הטיפים החדשה')
     st.download_button(
         label='הורד CSV',
-        data=new_record.to_csv(index=False).encode('utf-8'),
+        data=new_record.to_csv(index=False, encoding='utf-8').encode('utf-8'),
         file_name='NewTipRecord.csv',
         mime='text/csv'
     )
