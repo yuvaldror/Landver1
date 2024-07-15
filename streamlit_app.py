@@ -77,13 +77,13 @@ num_waitresses = st.number_input('כמה מלצרים עבדו', min_value=1, st
 waitresses = []
 
 for i in range(num_waitresses):
-    with st.expander(f'מלצרית {i+1}'):
-        name = st.text_input(f'הכנס את שם המלצרית {i+1}', key=f'name_{i}')
+    with st.expander(f'מלצר {i+1}'):
+        name = st.text_input(f'הכנס את שם המלצר {i+1}', key=f'name_{i}')
         hours_worked = st.number_input(f'כמה שעות המלצר {i+1} עבד', min_value=0.0, step=0.1, key=f'hours_{i}')
         waitresses.append({'שם': name, 'שעות עבודה': hours_worked})
 
 # Input for the total tips collected
-total_tips = st.number_input('כמה כסף יש בטיפים', min_value=0.0, step=0.01)
+total_tips = st.number_input('סך הכול טיפים', min_value=0.0, step=0.01)
 
 if st.button('חשב'):
     # Calculate total hours worked
