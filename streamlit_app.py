@@ -56,6 +56,10 @@ if st.button('חשב'):
     bar_deduction = total_tips * 0.03
     bar_deduction = round_down(bar_deduction)
 
+    # Calculate אחרי הפרשה
+    after_deduction = total_tips - bar_deduction
+    after_deduction = round_down(after_deduction)
+
     # Create a dataframe to store the results
     results = []
     total_service_fees = 0
@@ -86,21 +90,7 @@ if st.button('חשב'):
             'שם': '',
             'שעות עבודה': '',
             'סכום כולל': '',
-            'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
-            'נטו': ''
-        },
-        {
-            'שם': '',
-            'שעות עבודה': '',
-            'סכום כולל': '',
-            'דמי שירות': f'הפרשה לבר: {bar_deduction}',
-            'נטו': ''
-        },
-        {
-            'שם': '',
-            'שעות עבודה': '',
-            'סכום כולל': '',
-            'דמי שירות': f'סך הכול שעות: {total_hours}',
+            'דמי שירות': f'תאריך: {current_date}',
             'נטו': ''
         },
         {
@@ -114,7 +104,35 @@ if st.button('חשב'):
             'שם': '',
             'שעות עבודה': '',
             'סכום כולל': '',
-            'דמי שירות': f'תאריך: {current_date}',
+            'דמי שירות': f'סך הכול שעות: {total_hours}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'הפרשה לבר: {bar_deduction}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'אחרי הפרשה: {after_deduction}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול לשעה: {money_per_hour}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
             'נטו': ''
         }
     ]
@@ -128,6 +146,7 @@ if st.button('חשב'):
     st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
     st.success(f'סה"כ שעות עבודה: {total_hours} שעות')
     st.success(f'סה"כ טיפים: {round_down(total_tips)} ש"ח')
+    st.success(f'אחרי הפרשה: {after_deduction} ש"ח')
 
     # Save the results to a CSV file with the current date in the filename
     csv_filename = f'משמרת_{current_date}.csv'
