@@ -70,10 +70,10 @@ def get_shift_date_and_type():
     return shift_date_str
 
 # Set the title of the app
-st.title('לנדוור חישוב טיפים')
+st.title('טיפים של כוח השחם')
 
 # Input for the number of waitresses
-num_waitresses = st.number_input('הכנס את מספר המלצריות במשמרת', min_value=1, step=1)
+num_waitresses = st.number_input('הכנס את מספר המלצרים שעבדו', min_value=1, step=1)
 
 # Create a list to store the details of each waitress
 waitresses = []
