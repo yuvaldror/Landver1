@@ -78,6 +78,24 @@ if st.button('חשב'):
         })
 
     total_service_fees = round_down(total_service_fees)
+    
+    # Add the summary rows
+    results.append({
+        'שם': '',
+        'שעות עבודה': '',
+        'סכום כולל': '',
+        'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
+        'נטו': ''
+    })
+
+    results.append({
+        'שם': '',
+        'שעות עבודה': '',
+        'סכום כולל': '',
+        'דמי שירות': f'הפרשה לבר: {bar_deduction}',
+        'נטו': ''
+    })
+
     results_df = pd.DataFrame(results)
 
     # Display results
