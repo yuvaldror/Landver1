@@ -87,22 +87,7 @@ if st.button('חשב'):
 
     # Save the results to TipsSaver.csv with utf-8 encoding
     file_path = 'TipsSaver.csv'
-    if os.path.exists(file_path):
-        try:
-            existing_data = pd.read_csv(file_path, encoding='utf-8')
-            if set(existing_data.columns) != set(results_df.columns):
-                st.error("העמודות בקובץ הקיים לא תואמות לעמודות החדשות.")
-            else:
-                updated_data = pd.concat([existing_data, results_df], ignore_index=True)
-        except pd.errors.EmptyDataError:
-            updated_data = results_df
-        except pd.errors.ParserError:
-            st.error("שגיאה בקריאת הקובץ הקיים. נא לבדוק את תקינות הקובץ.")
-            updated_data = results_df
-    else:
-        updated_data = results_df
-
-    updated_data.to_csv(file_path, index=False, encoding='utf-8')
+    results_df.to_csv(file_path, index=False, encoding='utf-8')
 
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
@@ -116,6 +101,6 @@ if st.button('חשב'):
         mime='text/csv'
     )
 
-    # Display the collected data
+    # Display the current session's data
     st.subheader('נתוני טיפים שנאספו')
-    st.write(updated_data)
+    st.write(results_df)
