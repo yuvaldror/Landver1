@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 from datetime import datetime
+import os
 
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
@@ -21,3 +22,29 @@ with st.form(key='tips_form'):
 if submit_button:
     # If the submit button is pressed, save the data
     st.success(f'טיפים בסכום של {tips_amount} ש"ח שנאספו בתאריך {shift_date} נשמרו.')
+
+    # Create a new record
+    new_record = pd.DataFrame({'תאריך': [shift_date], 'טיפים': [tips_amount]})
+
+    # Save the new record to TipsSaver.csv
+    file_path = 'TipsSaver.csv'
+    if os.path.exists(file_path):
+        existing_data = pd.read_csv(file_path)
+        updated_data = pd.concat([existing_data, new_record], ignore_index=True)
+    else:
+        updated_data = new_record
+
+    updated_data.to_csv(file_path, index=False)
+
+    # Provide the new record for download
+    st.subheader('הורד את רשומת הטיפים החדשה')
+    st.download_button(
+        label='הורד CSV',
+        data=new_record.to_csv(index=False).encode('utf-8'),
+        file_name='NewTipRecord.csv',
+        mime='text/csv'
+    )
+
+    # Display the collected data
+    st.subheader('נתוני טיפים שנאספו')
+    st.write(updated_data)
