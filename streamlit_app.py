@@ -10,6 +10,18 @@ st.set_page_config(
     page_icon=':coffee:'
 )
 
+# Custom CSS to set RTL direction
+st.markdown(
+    """
+    <style>
+    .css-1aumxhk {text-align: right; direction: rtl;}
+    .css-16idsys {text-align: right; direction: rtl;}
+    .stDataFrame {direction: rtl;}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Function to round down values without decimal places
 def round_down(value):
     return math.floor(value)
