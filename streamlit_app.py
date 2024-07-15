@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 # Set the page configuration
@@ -25,6 +25,47 @@ st.markdown(
 # Function to round down values without decimal places
 def round_down(value):
     return math.floor(value)
+
+# Function to determine the correct date and shift type based on the current date and time
+def get_shift_date_and_type():
+    now = datetime.now()
+    day_of_week = now.weekday()
+    hour = now.hour
+
+    # Monday to Thursday: Show the previous day
+    if day_of_week in range(0, 4):
+        shift_date = now - timedelta(days=1)
+        shift_type = ""
+    # Friday: Before 6 AM show the previous day, after 6 AM add "משמרת בוקר"
+    elif day_of_week == 4:
+        if hour < 6:
+            shift_date = now - timedelta(days=1)
+            shift_type = ""
+        else:
+            shift_date = now
+            shift_type = "משמרת בוקר"
+    # Saturday: Before 6 AM show the previous day with "משמרת ערב", after 6 AM add "משמרת בוקר"
+    elif day_of_week == 5:
+        if hour < 6:
+            shift_date = now - timedelta(days=1)
+            shift_type = "משמרת ערב"
+        else:
+            shift_date = now
+            shift_type = "משמרת בוקר"
+    # Sunday: Before 6 AM show the previous day with "משמרת ערב"
+    elif day_of_week == 6:
+        if hour < 6:
+            shift_date = now - timedelta(days=1)
+            shift_type = "משמרת ערב"
+        else:
+            shift_date = now
+            shift_type = ""
+
+    shift_date_str = shift_date.strftime("%Y-%m-%d")
+    if shift_type:
+        shift_date_str += f" {shift_type}"
+
+    return shift_date_str
 
 # Set the title of the app
 st.title('אפליקציית ניהול טיפים למלצריות')
@@ -83,14 +124,16 @@ if st.button('חשב'):
 
     total_service_fees = round_down(total_service_fees)
     
+    # Get the correct shift date and type
+    shift_date_str = get_shift_date_and_type()
+
     # Add the summary rows
-    current_date = datetime.now().strftime("%Y-%m-%d")
     summary_rows = [
         {
             'שם': '',
             'שעות עבודה': '',
             'סכום כולל': '',
-            'דמי שירות': f'תאריך: {current_date}',
+            'דמי שירות': f'תאריך: {shift_date_str}',
             'נטו': ''
         },
         {
@@ -149,7 +192,7 @@ if st.button('חשב'):
     st.success(f'אחרי הפרשה: {after_deduction} ש"ח')
 
     # Save the results to a CSV file with the current date in the filename
-    csv_filename = f'משמרת_{current_date}.csv'
+    csv_filename = f'משמרת_{shift_date_str}.csv'
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
     # Convert the DataFrame to windows-1255 for download
