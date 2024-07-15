@@ -9,6 +9,7 @@ st.set_page_config(
     page_title='לנדוור חישוב טיפים',
     page_icon=':coffee:', # This is an emoji shortcode. Could be a URL too.
 )
+# Create a form to input tips
 with st.form(key='tips_form'):
     # Input for the amount of tips collected
     tips_amount = st.number_input('הכנס את סכום הטיפים שנאסף', min_value=0.0, step=0.01)
@@ -26,11 +27,20 @@ if submit_button:
     # Create a new record
     new_record = pd.DataFrame({'תאריך': [shift_date], 'טיפים': [tips_amount]})
 
-    # Save the new record to TipsSaver.csv
+    # Save the new record to TipsSaver.csv with utf-8 encoding
     file_path = 'TipsSaver.csv'
     if os.path.exists(file_path):
-        existing_data = pd.read_csv(file_path, encoding='utf-8')
-        updated_data = pd.concat([existing_data, new_record], ignore_index=True)
+        try:
+            existing_data = pd.read_csv(file_path, encoding='utf-8')
+            if set(existing_data.columns) != set(new_record.columns):
+                st.error("העמודות בקובץ הקיים לא תואמות לעמודות החדשות.")
+            else:
+                updated_data = pd.concat([existing_data, new_record], ignore_index=True)
+        except pd.errors.EmptyDataError:
+            updated_data = new_record
+        except pd.errors.ParserError:
+            st.error("שגיאה בקריאת הקובץ הקיים. נא לבדוק את תקינות הקובץ.")
+            updated_data = new_record
     else:
         updated_data = new_record
 
