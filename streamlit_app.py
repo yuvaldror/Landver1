@@ -59,7 +59,7 @@ if st.button('חשב'):
 
         results.append({
             'שם': waitress['שם'],
-            'שעות עבודה': round_down(waitress['שעות עבודה']),
+            'שעות עבודה': waitress['שעות עבודה'],
             'סכום כולל': total_made,
             'דמי שירות': service_fee,
             'נטו': net_income
@@ -104,4 +104,6 @@ if st.button('חשב'):
         mime='text/csv'
     )
 
-
+    # Display the collected data
+    st.subheader('נתוני טיפים שנאספו')
+    st.write(updated_data)
