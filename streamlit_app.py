@@ -9,7 +9,7 @@ st.set_page_config(
     page_title='לנדוור חישוב טיפים',
     page_icon=':coffee:', # This is an emoji shortcode. Could be a URL too.
 )
-#  Create a form to input tips
+# Create a form to input tips
 with st.form(key='tips_form'):
     # Input for the amount of tips collected
     tips_amount = st.number_input('הכנס את סכום הטיפים שנאסף', min_value=0.0, step=0.01)
@@ -27,11 +27,11 @@ if submit_button:
     # Create a new record
     new_record = pd.DataFrame({'תאריך': [shift_date], 'טיפים': [tips_amount]})
 
-    # Save the new record to TipsSaver.csv with ISO-8859-1 encoding
+    # Save the new record to TipsSaver.csv with utf-8-sig encoding
     file_path = 'TipsSaver.csv'
     if os.path.exists(file_path):
         try:
-            existing_data = pd.read_csv(file_path, encoding='ISO-8859-1')
+            existing_data = pd.read_csv(file_path, encoding='utf-8-sig')
             if set(existing_data.columns) != set(new_record.columns):
                 st.error("העמודות בקובץ הקיים לא תואמות לעמודות החדשות.")
             else:
@@ -44,13 +44,13 @@ if submit_button:
     else:
         updated_data = new_record
 
-    updated_data.to_csv(file_path, index=False, encoding='ISO-8859-1')
+    updated_data.to_csv(file_path, index=False, encoding='utf-8-sig')
 
     # Provide the new record for download
     st.subheader('הורד את רשומת הטיפים החדשה')
     st.download_button(
         label='הורד CSV',
-        data=new_record.to_csv(index=False, encoding='ISO-8859-1').encode('ISO-8859-1'),
+        data=new_record.to_csv(index=False, encoding='utf-8-sig').encode('utf-8-sig'),
         file_name='NewTipRecord.csv',
         mime='text/csv'
     )
