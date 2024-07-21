@@ -222,18 +222,7 @@ if st.button('חשב'):
     csv_filename = f'משמרת_{shift_date_str}.csv'
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
-    if "email_sent" not in st.session_state:
-        st.session_state.email_sent = False
-
-    # Button to send the CSV file as an email attachment
-    if st.button('Send Email') or st.session_state.email_sent:
-        with st.spinner('Sending email...'):
-            subject = f"Report - משמרת {shift_date_str}"
-            body = "Testing"
-            to = "kingfalldror2@gmail.com"
-            send_email(subject, body, to, csv_filename)
-            st.session_state.email_sent = True
-            st.success('Email sent successfully!')
+   
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
 
@@ -249,3 +238,13 @@ if st.button('חשב'):
     # Display the current session's data
     st.subheader('סוף משמרת')
     st.write(results_df)
+
+if 'csv_filename' in st.session_state:
+    # Button to send the CSV file as an email attachment
+    if st.button('Send Email'):
+        with st.spinner('Sending email...'):
+            subject = f"Report - משמרת {st.session_state.csv_filename.split('_')[1].split('.')[0]}"
+            body = "Testing"
+            to = "kingfalldror2@gmail.com"
+            send_email(subject, body, to, st.session_state.csv_filename)
+            st.success('Email sent successfully!')
