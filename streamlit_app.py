@@ -223,10 +223,12 @@ if st.button('חשב'):
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
     if st.button('Send Email'):
-        subject = f"Report - משמרת {shift_date_str}"
-        body = "Testing"
-        to = "kingfalldror2@gmail.com"
-        send_email(subject, body, to, csv_filename)
+        with st.spinner('Sending email...'):
+            subject = f"Report - משמרת {shift_date_str}"
+            body = "Testing"
+            to = "kingfalldror2@gmail.com"
+            send_email(subject, body, to, csv_filename)
+            st.success('Email sent successfully!')
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
 
