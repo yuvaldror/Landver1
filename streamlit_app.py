@@ -4,8 +4,7 @@ import math
 from datetime import datetime, timedelta
 import pytz
 import os
-import smtplib
-from email.message import EmailMessage
+
 
 # Set the page configuration
 st.set_page_config(
@@ -70,34 +69,6 @@ def get_shift_date_and_type():
         shift_date_str += f" {shift_type}"
 
     return shift_date_str
-
-def send_email(subject, body, to, attachment_path):
-    email_user = st.secrets["EMAIL_USER"]
-    email_password = st.secrets["EMAIL_PASSWORD"]
-
-    # Debugging statements
-    st.write(f"EMAIL_USER: {email_user}")
-    st.write(f"EMAIL_PASSWORD: {email_password}")
-
-    email_send = to
-
-    msg = EmailMessage()
-    msg['From'] = email_user
-    msg['To'] = email_send
-    msg['Subject'] = subject
-
-    msg.set_content(body)
-
-    with open(attachment_path, 'rb') as f:
-        file_data = f.read()
-        file_name = os.path.basename(attachment_path)
-
-    msg.add_attachment(file_data, maintype='application', subtype='octet-stream', filename=file_name)
-
-    context = smtplib.ssl.create_default_context()
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
-        server.login(email_user, email_password)
-        server.send_message(msg)
 
 st.title('טיפים של כוח השחם')
 
@@ -225,14 +196,6 @@ if st.button('חשב'):
     # Save the results to a CSV file with the current date in the filename
     csv_filename = f'משמרת_{shift_date_str}.csv'
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
-
-    # Send the CSV file as an email attachment
-    with st.spinner('Sending email...'):
-        subject = f"Report - משמרת {shift_date_str}"
-        body = "Testing"
-        to = "kingfalldror2@gmail.com"
-        send_email(subject, body, to, csv_filename)
-        st.success('Email sent successfully!')
 
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
