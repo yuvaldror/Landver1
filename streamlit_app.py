@@ -69,7 +69,7 @@ def get_shift_date_and_type():
 
     return shift_date_str
 
-def save_csv_in_designated_folder(file_path, filename):
+def save_csv_in_designated_folder(filename):
     now = datetime.now(pytz.timezone('Asia/Jerusalem'))
     books_folder = "Books"
     year_folder = f"{books_folder}/{now.year}"
@@ -88,7 +88,8 @@ def save_csv_in_designated_folder(file_path, filename):
     # If the file already exists, delete it
     if os.path.exists(destination):
         os.remove(destination)
-    os.rename(file_path, destination)
+
+    os.rename(filename, destination)
     
 # Set the title of the app
 st.title('טיפים של כוח השחם')
@@ -217,7 +218,7 @@ if st.button('חשב'):
     # Save the results to a CSV file with the current date in the filename
     csv_filename = f'משמרת_{shift_date_str}.csv'
     results_df.to_csv(csv_filename, index=False, encoding='utf-8')
-    save_csv_in_designated_folder(csv_filename, csv_filename)
+    save_csv_in_designated_folder(csv_filename)
 
     # Convert the DataFrame to windows-1255 for download
     results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
