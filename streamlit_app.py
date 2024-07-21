@@ -74,6 +74,11 @@ def get_shift_date_and_type():
 def send_email(subject, body, to, attachment_path):
     email_user = st.secrets["EMAIL_USER"]
     email_password = st.secrets["EMAIL_PASSWORD"]
+
+    # Debugging statements
+    st.write(f"EMAIL_USER: {email_user}")
+    st.write(f"EMAIL_PASSWORD: {email_password}")
+
     email_send = to
 
     msg = EmailMessage()
