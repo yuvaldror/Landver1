@@ -70,7 +70,7 @@ def get_shift_date_and_type():
         shift_date_str += f" {shift_type}"
 
     return shift_date_str
-    
+
 def send_email(subject, body, to, attachment_path):
     email_user = st.secrets["EMAIL_USER"]
     email_password = st.secrets["EMAIL_PASSWORD"]
@@ -93,7 +93,6 @@ def send_email(subject, body, to, attachment_path):
     with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
         server.login(email_user, email_password)
         server.send_message(msg)
-
 
 st.title('טיפים של כוח השחם')
 
