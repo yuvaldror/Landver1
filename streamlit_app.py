@@ -90,7 +90,6 @@ def calculate_tips():
         st.session_state.waitresses = waitresses
         st.session_state.total_tips = total_tips
         st.session_state.step = 'summary'
-        st.experimental_rerun()
 
 # Function to fill shift summary
 def shift_summary():
