@@ -64,17 +64,6 @@ def get_shift_date_and_type():
 
     return shift_date_str
 
-# נוודא שהמצב מעודכן לפני הרצת הפונקציות
-if 'step' in st.session_state and st.session_state.step == 'summary':
-    shift_summary()
-elif 'step' in st.session_state and st.session_state.step == 'tips':
-    calculate_tips()
-else:
-    # אתחול ברירת מחדל
-    st.session_state.step = 'tips'
-    calculate_tips()
-
-
 # Initialize session state
 if 'step' not in st.session_state:
     st.session_state.step = 'tips'
