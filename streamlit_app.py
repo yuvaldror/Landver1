@@ -67,6 +67,8 @@ def get_shift_date_and_type():
 # Initialize session state
 if 'step' not in st.session_state:
     st.session_state.step = 'tips'
+    st.session_state.waitresses = []
+    st.session_state.total_tips = 0.0
 
 # Function to calculate tips
 def calculate_tips():
@@ -88,8 +90,7 @@ def calculate_tips():
         st.session_state.waitresses = waitresses
         st.session_state.total_tips = total_tips
         st.session_state.step = 'summary'
-
-        st.success('חישוב הטיפים הושלם! עוברים לסיכום המשמרת.')
+        st.experimental_rerun()
 
 # Function to fill shift summary
 def shift_summary():
