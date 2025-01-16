@@ -64,6 +64,17 @@ def get_shift_date_and_type():
 
     return shift_date_str
 
+# נוודא שהמצב מעודכן לפני הרצת הפונקציות
+if 'step' in st.session_state and st.session_state.step == 'summary':
+    shift_summary()
+elif 'step' in st.session_state and st.session_state.step == 'tips':
+    calculate_tips()
+else:
+    # אתחול ברירת מחדל
+    st.session_state.step = 'tips'
+    calculate_tips()
+
+
 # Initialize session state
 if 'step' not in st.session_state:
     st.session_state.step = 'tips'
@@ -90,9 +101,6 @@ def calculate_tips():
         st.session_state.waitresses = waitresses
         st.session_state.total_tips = total_tips
         st.session_state.step = 'summary'
-        st.experimental_rerun()
-
-
 # Function to fill shift summary
 def shift_summary():
     st.title('סיכום משמרת')
