@@ -1,8 +1,11 @@
+
 import streamlit as st
 import pandas as pd
 import math
 from datetime import datetime, timedelta
 import pytz
+import os
+
 
 # Set the page configuration
 st.set_page_config(
@@ -33,9 +36,11 @@ def get_shift_date_and_type():
     day_of_week = now.weekday()
     hour = now.hour
 
+    # Monday to Thursday: Show the previous day
     if day_of_week in range(0, 4):
         shift_date = now - timedelta(days=1)
         shift_type = ""
+    # Friday: Before 6 AM show the previous day, after 6 AM add "משמרת בוקר"
     elif day_of_week == 4:
         if hour < 6:
             shift_date = now - timedelta(days=1)
@@ -43,6 +48,7 @@ def get_shift_date_and_type():
         else:
             shift_date = now
             shift_type = "משמרת בוקר"
+    # Saturday: Before 6 AM show the previous day with "משמרת ערב", after 6 AM add "משמרת בוקר"
     elif day_of_week == 5:
         if hour < 6:
             shift_date = now - timedelta(days=1)
@@ -50,6 +56,7 @@ def get_shift_date_and_type():
         else:
             shift_date = now
             shift_type = "משמרת בוקר"
+    # Sunday: Before 6 AM show the previous day with "משמרת ערב"
     elif day_of_week == 6:
         if hour < 6:
             shift_date = now - timedelta(days=1)
@@ -64,93 +71,145 @@ def get_shift_date_and_type():
 
     return shift_date_str
 
-# Initialize session state
-if 'step' not in st.session_state:
-    st.session_state.step = 'tips'
-    st.session_state.waitresses = []
-    st.session_state.total_tips = 0.0
+st.title('טיפים של כוח השחם')
 
-# Function to calculate tips
-def calculate_tips():
-    st.title('טיפים של כוח השחם')
+# Input for the number of waitresses
+num_waitresses = st.number_input('הכנס את מספר המלצרים שעבדו', min_value=1, step=1)
 
-    num_waitresses = st.number_input('הכנס את מספר המלצרים שעבדו', min_value=1, step=1)
+# Create a list to store the details of each waitress
+waitresses = []
 
-    waitresses = []
+for i in range(num_waitresses):
+    with st.expander(f'מלצר {i+1}'):
+        name = st.text_input(f'הכנס את שם המלצר {i+1}', key=f'name_{i}')
+        hours_worked = st.number_input(f'כמה שעות המלצר {i+1} עבד', min_value=0.0, step=0.1, key=f'hours_{i}')
+        waitresses.append({'שם': name, 'שעות עבודה': hours_worked})
 
-    for i in range(num_waitresses):
-        with st.expander(f'מלצר {i+1}'):
-            name = st.text_input(f'הכנס את שם המלצר {i+1}', key=f'name_{i}')
-            hours_worked = st.number_input(f'כמה שעות המלצר {i+1} עבד', min_value=0.0, step=0.1, key=f'hours_{i}')
-            waitresses.append({'שם': name, 'שעות עבודה': hours_worked})
+# Input for the total tips collected
+total_tips = st.number_input('סך הכול טיפים', min_value=0.0, step=0.01)
 
-    total_tips = st.number_input('סך הכול טיפים', min_value=0.0, step=0.01)
+if st.button('חשב'):
+    # Calculate total hours worked
+    total_hours = sum(waitress['שעות עבודה'] for waitress in waitresses)
 
-    if st.button('חשב'):
-        st.session_state.waitresses = waitresses
-        st.session_state.total_tips = total_tips
-        st.session_state.step = 'summary'
-# Function to fill shift summary
-def shift_summary():
-    st.title('סיכום משמרת')
+    # Calculate money made per hour
+    money_per_hour = (total_tips * 0.97) / total_hours if total_hours > 0 else 0
+    money_per_hour = round_down(money_per_hour)
 
-    waitresses = st.session_state.get('waitresses', [])
-    total_tips = st.session_state.get('total_tips', 0)
+    # Calculate הפרשה לבר
+    bar_deduction = total_tips * 0.03
+    bar_deduction = round_down(bar_deduction)
 
-    closing_cash = st.number_input('סגירת קופה (₪)', min_value=0.0, step=0.01)
-    avg_per_guest = st.number_input('ממוצע לסועד (₪)', min_value=0.0, step=0.01)
+    # Calculate אחרי הפרשה
+    after_deduction = total_tips - bar_deduction
+    after_deduction = round_down(after_deduction)
 
-    st.subheader('מלצרים שעבדו')
-    waitresses_names = [waitress['שם'] for waitress in waitresses if waitress['שם']]
-    selected_waitresses = st.multiselect('בחר את המלצרים שעבדו במשמרת', waitresses_names, default=waitresses_names)
-    waitresses_performance = {}
-    for waitress in selected_waitresses:
-        performance = st.slider(f'דרג את תפקודו של {waitress} (1-10)', min_value=1, max_value=10)
-        waitresses_performance[waitress] = performance
+    # Create a dataframe to store the results
+    results = []
+    total_service_fees = 0
 
-    st.subheader('ברמנים')
-    bartender_name = st.text_input('מי הברמן במשמרת?')
-    bartender_performance = st.slider('דרג את תפקוד הברמן (1-10)', min_value=1, max_value=10) if bartender_name else None
+    for waitress in waitresses:
+        total_made = waitress['שעות עבודה'] * money_per_hour
+        total_made = round_down(total_made)
+        service_fee = total_made * 0.2
+        service_fee = round_down(service_fee)
+        net_income = total_made * 0.8
+        net_income = round_down(net_income)
+        total_service_fees += service_fee
 
-    shortages = st.text_area('רשום חוסרים למשמרת הבאה')
+        results.append({
+            'שם': waitress['שם'],
+            'שעות עבודה': waitress['שעות עבודה'],
+            'סכום כולל': total_made,
+            'דמי שירות': service_fee,
+            'נטו': net_income
+        })
 
-    if st.button('שמור סיכום משמרת'):
-        shift_date_str = get_shift_date_and_type()
+    total_service_fees = round_down(total_service_fees)
+    
+    # Get the correct shift date and type
+    shift_date_str = get_shift_date_and_type()
 
-        summary_data = {
-            'סגירת קופה': closing_cash,
-            'ממוצע לסועד': avg_per_guest,
-            'מלצרים שעבדו': selected_waitresses,
-            'תפקוד המלצרים': waitresses_performance,
-            'שם הברמן': bartender_name,
-            'תפקוד הברמן': bartender_performance,
-            'חוסרים': shortages
+    # Add the summary rows
+    summary_rows = [
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'תאריך: {shift_date_str}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול טיפים: {round_down(total_tips)}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול שעות: {total_hours}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'הפרשה לבר: {bar_deduction}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'אחרי הפרשה: {after_deduction}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול לשעה: {money_per_hour}',
+            'נטו': ''
+        },
+        {
+            'שם': '',
+            'שעות עבודה': '',
+            'סכום כולל': '',
+            'דמי שירות': f'סך הכול דמי שירות: {total_service_fees}',
+            'נטו': ''
         }
+    ]
 
-        tips_filename = f'משמרת_{shift_date_str}.csv'
-        summary_filename = f'משמרת_{shift_date_str}_סיכום_משמרת.csv'
+    results.extend(summary_rows)
+    results_df = pd.DataFrame(results)
 
-        tips_data = pd.DataFrame(st.session_state.waitresses)
-        tips_data.to_csv(tips_filename, index=False, encoding='utf-8')
+    # Display results
+    st.success(f'סכום כסף לשעה: {money_per_hour} ש"ח')
+    st.success(f'הפרשה לבר: {bar_deduction} ש"ח')
+    st.success(f'סה"כ דמי שירות: {total_service_fees} ש"ח')
+    st.success(f'סה"כ שעות עבודה: {total_hours} שעות')
+    st.success(f'סה"כ טיפים: {round_down(total_tips)} ש"ח')
+    st.success(f'אחרי הפרשה: {after_deduction} ש"ח')
 
-        pd.DataFrame([summary_data]).to_csv(summary_filename, index=False, encoding='utf-8')
+    # Save the results to a CSV file with the current date in the filename
+    csv_filename = f'משמרת_{shift_date_str}.csv'
+    results_df.to_csv(csv_filename, index=False, encoding='utf-8')
 
-        st.success('סיכום המשמרת נשמר בהצלחה!')
-        st.download_button(
-            label='הורד את קובץ הטיפים',
-            data=tips_data.to_csv(index=False, encoding='utf-8').encode('utf-8'),
-            file_name=tips_filename,
-            mime='text/csv'
-        )
-        st.download_button(
-            label='הורד את סיכום המשמרת',
-            data=pd.DataFrame([summary_data]).to_csv(index=False, encoding='utf-8').encode('utf-8'),
-            file_name=summary_filename,
-            mime='text/csv'
-        )
+    # Convert the DataFrame to windows-1255 for download
+    results_df_encoded = results_df.applymap(lambda x: str(x).encode('windows-1255', errors='ignore').decode('windows-1255'))
 
-# Manage the process
-if st.session_state.step == 'tips':
-    calculate_tips()
-elif st.session_state.step == 'summary':
-    shift_summary()
+    # Provide the new record for download
+    st.subheader('הורד את רשומת הטיפים החדשה')
+    st.download_button(
+        label='הורד CSV',
+        data=results_df_encoded.to_csv(index=False, encoding='windows-1255').encode('windows-1255'),
+        file_name=csv_filename,
+        mime='text/csv'
+    )
+
+    # Display the current session's data
+    st.subheader('סוף משמרת')
+    st.write(results_df)
